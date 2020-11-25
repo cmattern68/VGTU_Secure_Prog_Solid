@@ -17,16 +17,17 @@ class AvParser {
 class Compute {
     static function run($formattedContent) {
         $state = 0;
+        $formattedContent = $formattedContent->parse();
         while (1) {
-            foreach ($formattedContent["rules"] as $rule) {
-                if ($rule["state"] == $state && $rule["read"] == $formattedContent["tape"][$formattedContent["head-start-position"]]) {
-                    $formattedContent["tape"][$formattedContent["head-start-position"]] = $rule["write"];
+            foreach ($formattedContent->fileContent["rules"] as $rule) {
+                if ($rule["state"] == $state && $rule["read"] == $formattedContent->fileContent["tape"][$formattedContent->fileContent["head-start-position"]]) {
+                    $formattedContent->fileContent["tape"][$formattedContent->fileContent["head-start-position"]] = $rule["write"];
                     if ($rule["move"] == "L")
-                        --$formattedContent["head-start-position"];
+                        --$formattedContent->fileContent["head-start-position"];
                     else if ($rule["move"] == "R")
-                        ++$formattedContent["head-start-position"];
+                        ++$formattedContent->fileContent["head-start-position"];
                     $state = $rule["next-state"];
-                    foreach ($formattedContent["tape"] as $c) {
+                    foreach ($formattedContent->fileContent["tape"] as $c) {
                         echo $c;
                     }
                     echo "\n";
@@ -49,10 +50,10 @@ class TuringMachine {
     private function readerByExt($file, $ext) {
         switch ($ext) {
             case "json":
-                return jsonParser::parse($file);
+                return new jsonParser($file);
                 break;
             case "txt":
-                return txtParser::parse($file);
+                return new txtParser($file);
                 break;
             default:
                 return null;

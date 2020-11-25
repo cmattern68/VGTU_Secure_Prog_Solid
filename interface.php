@@ -1,17 +1,23 @@
 <?php
 
-interface iParser
-{
-    static public function parse($file);
+abstract class aParser {
+    public $file;
+    public $fileContent = array();
+
+    public function __construct($file) {
+        $this->file = $file;
+    }
+
+    abstract public function parse();
 }
 
-class txtParser implements iParser {
-    static public function parse($file) {
-        if (!file_exists($file)) {
+class txtParser extends aParser {
+    public function parse() {
+        if (!file_exists($this->file)) {
             throw new Exception('File dosent exist.');
         }
         $formattedContent = array();
-        $handle = fopen($file, "r");
+        $handle = fopen($this->file, "r");
         for ($i = 1; ($line = fgets($handle)) !== false; ++$i) {
             if ($i == 1) {
                 $formattedContent["head-start-position"] = trim($line);
@@ -29,17 +35,19 @@ class txtParser implements iParser {
             }
         }
         fclose($handle);
-        return $formattedContent;
+        $this->fileContent = $formattedContent;
+        return $this;
     }
 }
 
-class jsonParser implements iParser {
-    static public function parse($file) {
-        if (!file_exists($file)) {
+class jsonParser extends aParser {
+    public function parse() {
+        if (!file_exists($this->file)) {
             throw new Exception('File dosent exist.');
         }
-        $formattedContent = json_decode(file_get_contents($file), true);
+        $formattedContent = json_decode(file_get_contents($this->file), true);
         $formattedContent["tape"] = str_split($formattedContent["tape"]);
-        return $formattedContent;
+        $this->fileContent = $formattedContent;
+        return $this;
     }
 }
