@@ -28,6 +28,7 @@ class txtParser implements iParser {
                 );
             }
         }
+        fclose($handle);
         return $formattedContent;
     }
 }
